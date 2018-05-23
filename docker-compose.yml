@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+
+  pricingsvc:
+    build:
+      context: pricingsvc/
+    ports:
+      - "8081:8081"
+    networks:
+      - mint
+
+  rankingsvc:
+    build:
+      context: rankingsvc/
+    ports:
+      - "8082:8082"
+    networks:
+      - mint
+
+  api:
+    build:
+      context: api/
+    ports:
+      - "8080:8080"
+    networks:
+      - mint
+    depends_on:
+      - rankingsvc
+      - pricingsvc
+
+networks:
+
+  mint:
+    driver: bridge
