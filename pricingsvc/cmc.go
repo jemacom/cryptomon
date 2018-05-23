@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	cmc "github.com/coincircle/go-coinmarketcap"
 )
 
@@ -19,8 +17,5 @@ func getCurrentPrices(currency string) (map[string]float64, error) {
 	for _, ticker := range tickers {
 		currentPrices[ticker.Symbol] = ticker.Quotes["USD"].Price
 	}
-
-	fmt.Printf("%v", currentPrices)
-
 	return currentPrices, nil
 }

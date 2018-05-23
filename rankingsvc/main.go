@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"log"
 	"net/http"
@@ -20,21 +21,29 @@ func main() {
 }
 
 func rankingHandler(w http.ResponseWriter, r *http.Request) {
-	limitParam, ok := r.URL.Query()["limit"]
 
-	if !ok || len(limitParam) < 1 {
-		log.Println("URL Param 'limit' is missing")
+	limit, err := parseLimitParam(r)
+	if err != nil {
 		return
 	}
-
-	limit, err := strconv.Atoi(limitParam[0])
-	if err != nil {
-		log.Println(err)
-	}
-
 	ranking, err := getRanking(limit)
 	if err != nil {
 		log.Println(err)
 	}
 	json.NewEncoder(w).Encode(ranking)
+}
+
+func parseLimitParam(r *http.Request) (int, error) {
+	limitParam, ok := r.URL.Query()["limit"]
+
+	if !ok || len(limitParam) < 1 {
+		return -1, errors.New("URL Param 'limit' is missing")
+	}
+
+	l, err := strconv.Atoi(limitParam[0])
+	if err != nil {
+		return -1, err
+	}
+
+	return l, nil
 }
