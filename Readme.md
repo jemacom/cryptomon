@@ -18,5 +18,31 @@ docker-compose up -d
 
 The HTTP API service will bind to localhost on port 8080 and you can send requests to the API
 ```
-curl 'http://localhost:8080/v1?limit=15'
+curl 'http://localhost:8080/v1?limit=4'
+```
+
+The output is in a json format
+```json
+[
+    {
+        "Rank": 1,
+        "Symbol": "BTC",
+        "PriceUSD": 7927.73
+    },
+    {
+        "Rank": 2,
+        "Symbol": "ETH",
+        "PriceUSD": 625.752
+    },
+    {
+        "Rank": 3,
+        "Symbol": "LTC",
+        "PriceUSD": 125.566
+    },
+    {
+        "Rank": 4,
+        "Symbol": "DASH",
+        "PriceUSD": 351.144
+    }
+]
 ```
