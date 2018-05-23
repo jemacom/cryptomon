@@ -1,6 +1,8 @@
 # CryptoMon
 
-CryptoMon gives you an insight about the vibrant world of cryptocurrencies by listing their prices at demand.
+CryptoMon gives you an insight about the vibrant world of cryptocurrencies by listing their prices.
+
+## Description
 
 The project is composed of three microservices:
 * `pricingsvc` Pricing Service that keeps the up-to-date pricing information
@@ -8,6 +10,19 @@ The project is composed of three microservices:
 * `api` HTTP-API Service that exposes a HTTP endpoint that returns the up-to-date list of top coins prices.
 
 Those microservices use HTTP to communicate with each others.
+
+## Technical choices
+
+* `pricingsvc` uses a CoinMarketCap client `github.com/coincircle/go-coinmarketcap` to get the prices of all cryptocurrencies.
+
+* `rankingsvc` uses a CryptoCompare client `github.com/lucazulian/cryptocomparego` to get the ranking.
+
+* We use `multi-stage builds` feature of Docker to build small images.
+
+* `Docker compose` help us with the orchestration discovery of services.
+
+* We use `Golang` because we love it !
+
 
 ## Run
 
@@ -46,3 +61,10 @@ The output is in a json format
     }
 ]
 ```
+
+# Next steps
+
+* Use `gRPC` for microservices communication
+* Write `kubernetes` config files
+* Use `Opentracing` for debugging and trancing requests
+* Use `swagger` for API definition.
