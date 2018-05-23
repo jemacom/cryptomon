@@ -10,6 +10,12 @@ import (
 	"strconv"
 )
 
+type coin struct {
+	Rank     int
+	Symbol   string
+	PriceUSD float64
+}
+
 func main() {
 	port := flag.Int("port", 0, "TCP port for the HTTP server to listen on")
 	pricingServerURL := flag.String("pricingServerURL", "", "URL to the 'princing' instance")
@@ -20,7 +26,7 @@ func main() {
 	http.HandleFunc("/v1", func(w http.ResponseWriter, r *http.Request) {
 		topCoinsHandler(w, r, *pricingServerURL, *rankingServerURL)
 	})
-	log.Println("API server is running on http://localhost:8080/v1...")
+	log.Println("API server is running...")
 
 	http.ListenAndServe(":"+strconv.Itoa(*port), nil)
 }
@@ -29,47 +35,77 @@ func topCoinsHandler(w http.ResponseWriter, r *http.Request, pricingServerURL st
 	limitParam, ok := r.URL.Query()["limit"]
 
 	if !ok || len(limitParam) < 1 {
-		log.Println("Url Param 'limit' is missing")
+		log.Println("URL Param 'limit' is missing")
+		return
+	}
+
+	var coins []coin
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "    ")
+
+	// The limit parameter shouldn't be negative or 0
+	// if so we return empty price list
+	l, err := strconv.Atoi(limitParam[0])
+	if err != nil {
+		return
+	}
+	if l <= 0 {
+		if err = enc.Encode(coin{}); err != nil {
+			panic(err)
+		}
 		return
 	}
 
 	// get ranking
-	resp, err := http.Get(fmt.Sprintf("%s?limit=%s", rankingServerURL, limitParam[0]))
+	ranking, err := getRanking(rankingServerURL, limitParam[0])
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-
-	ranking := make(map[int]string)
-	json.NewDecoder(resp.Body).Decode(&ranking)
-
 	// get pricing
-	resp, err = http.Get(fmt.Sprintf("%s?limit=%s", pricingServerURL, limitParam[0]))
+	pricing, err := getPricing(pricingServerURL, limitParam[0])
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-
-	pricing := make(map[string]float64)
-	json.NewDecoder(resp.Body).Decode(&pricing)
 
 	keys := make([]int, 1, len(ranking))
-
 	for k := range ranking {
 		keys = append(keys, k)
 	}
-
 	sort.Ints(keys)
 
-	var coins []coin
-
-	fmt.Println()
-	fmt.Println("Rank,   Symbol,   Price USD")
 	for k := range keys {
 		if ranking[k] != "" {
 			c := coin{Rank: k, Symbol: ranking[k], PriceUSD: pricing[ranking[k]]}
 			coins = append(coins, c)
 		}
 	}
-	json.NewEncoder(w).Encode(coins)
+	if err := enc.Encode(coins); err != nil {
+		panic(err)
+	}
+}
+
+func getRanking(rankingServerURL string, limit string) (map[int]string, error) {
+	resp, err := http.Get(fmt.Sprintf("%s?limit=%s", rankingServerURL, limit))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	r := make(map[int]string)
+	json.NewDecoder(resp.Body).Decode(&r)
+
+	return r, nil
+}
+
+func getPricing(pricingServerURL string, limit string) (map[string]float64, error) {
+	resp, err := http.Get(fmt.Sprintf("%s?limit=%s", pricingServerURL, limit))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	p := make(map[string]float64)
+	json.NewDecoder(resp.Body).Decode(&p)
+
+	return p, nil
 }

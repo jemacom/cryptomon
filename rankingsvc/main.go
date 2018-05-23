@@ -14,7 +14,7 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/v1/ranking", rankingHandler)
-	log.Println("Ranking server is running on http://localhost:8082/v1/ranking...")
+	log.Println("Ranking server is running...")
 
 	http.ListenAndServe(":"+strconv.Itoa(*port), nil)
 }
@@ -23,7 +23,7 @@ func rankingHandler(w http.ResponseWriter, r *http.Request) {
 	limitParam, ok := r.URL.Query()["limit"]
 
 	if !ok || len(limitParam) < 1 {
-		log.Println("Url Param 'limit' is missing")
+		log.Println("URL Param 'limit' is missing")
 		return
 	}
 

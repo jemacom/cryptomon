@@ -2,7 +2,7 @@ FROM golang as builder
 
 WORKDIR /go/src/github.com/jemacom/cryptomon/api
 
-COPY ["coin.go", "main.go", "./"]
+COPY ["main.go", "./"]
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o api .
 
