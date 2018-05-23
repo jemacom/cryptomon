@@ -24,14 +24,14 @@ func main() {
 	flag.Parse()
 
 	http.HandleFunc("/v1", func(w http.ResponseWriter, r *http.Request) {
-		topCoinsHandler(w, r, *pricingServerURL, *rankingServerURL)
+		listCoinsHandler(w, r, *pricingServerURL, *rankingServerURL)
 	})
 	log.Println("API server is running...")
 
 	http.ListenAndServe(":"+strconv.Itoa(*port), nil)
 }
 
-func topCoinsHandler(w http.ResponseWriter, r *http.Request, pricingServerURL string, rankingServerURL string) {
+func listCoinsHandler(w http.ResponseWriter, r *http.Request, pricingServerURL string, rankingServerURL string) {
 	limitParam, ok := r.URL.Query()["limit"]
 
 	if !ok || len(limitParam) < 1 {
