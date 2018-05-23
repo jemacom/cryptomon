@@ -6,7 +6,7 @@ import (
 	cmc "github.com/coincircle/go-coinmarketcap"
 )
 
-func getCurrentPrices(limit int, currency string) (map[string]float64, error) {
+func getCurrentPrices(currency string) (map[string]float64, error) {
 	currentPrices := make(map[string]float64)
 
 	tickers, err := cmc.Tickers(&cmc.TickersOptions{
