@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strconv"
 
 	"github.com/lucazulian/cryptocomparego"
@@ -29,19 +28,5 @@ func getRanking(limit int) (map[int]string, error) {
 			rankingList[order] = coin.Name
 		}
 	}
-
-	keys := make([]int, 0, len(rankingList))
-
-	for k := range rankingList {
-		keys = append(keys, k)
-	}
-
-	sort.Ints(keys)
-
-	sortedRankingList := make(map[int]string)
-	for _, k := range keys {
-		sortedRankingList[k] = rankingList[k]
-	}
-
-	return sortedRankingList, nil
+	return rankingList, nil
 }
